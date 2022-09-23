@@ -17,10 +17,8 @@ var nearestVehicles = Vehicle.Find(
 if (nearestVehicles != null)
     foreach (var vehicle in nearestVehicles)
     {
-        Console.WriteLine($"\nUser Location: {vehicle.UserLatitude}, {vehicle.UserLongitude}");
-        Console.WriteLine($"Position Id: {vehicle.PositionId}");
+        Console.WriteLine($"\nPosition Id: {vehicle.PositionId}");
         Console.WriteLine($"Vehicle Registration: {vehicle.VehicleRegistration}");
         Console.WriteLine($"Vehicle Location: {vehicle.VehicleLatitude}, {vehicle.VehicleLongitude}");
         Console.WriteLine($"RecordedTimeUTC: {vehicle.RecordedTimeUTC}");
-        Console.WriteLine($"Distance: {Math.Round(Convert.ToDecimal(vehicle.Distance))} m");
     }

@@ -1,4 +1,5 @@
 ﻿using GeoCoordinatePortable;
+using Geohash;
 using System.Diagnostics;
 using VehiclePositionFinder.Models;
 
@@ -35,29 +36,14 @@ namespace VehiclePositionFinder.Classes
 
             Parallel.ForEach(listOfCurrentLocations, currentLocation =>
             {
-                var nearestVehicle = new VehiclePosition
-                {
-                    UserLatitude = currentLocation.Latitude.ToString(),
-                    UserLongitude = currentLocation.Longitude.ToString()
-                };
+                var currentLocationGeohash = new Geohasher().Encode(currentLocation.Latitude, currentLocation.Longitude);
 
-                foreach (var vehicle in listOfVehicles)
-                {
-                    var vehicleCoordinate = new GeoCoordinate(vehicle.VehicleLatitude, vehicle.VehicleLongitude);
-                    var calculatedDistance = currentLocation.GetDistanceTo(vehicleCoordinate);
+                var vehicle = listOfVehicles
+                        .Where(v => v.VehicleGeohash == currentLocationGeohash)
+                        .OrderBy(v => currentLocation.GetDistanceTo(new GeoCoordinate(v.VehicleLatitude, v.VehicleLongitude)))
+                        .First();
 
-                    if (calculatedDistance < nearestVehicle.Distance || nearestVehicle.Distance == null)
-                    {
-                        nearestVehicle.PositionId = vehicle.PositionId;
-                        nearestVehicle.VehicleRegistration = vehicle.VehicleRegistration;
-                        nearestVehicle.VehicleLatitude = vehicle.VehicleLatitude;
-                        nearestVehicle.VehicleLongitude = vehicle.VehicleLongitude;
-                        nearestVehicle.RecordedTimeUTC = vehicle.RecordedTimeUTC;
-                        nearestVehicle.Distance = calculatedDistance;
-                    }
-                }
-
-                nearestVehicles.Add(nearestVehicle);
+                nearestVehicles.Add(vehicle);
             });
 
             return nearestVehicles;

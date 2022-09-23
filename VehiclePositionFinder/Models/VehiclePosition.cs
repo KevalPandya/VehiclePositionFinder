@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿using Geohash;
+using System.Text;
 
 namespace VehiclePositionFinder.Models
 {
     internal class VehiclePosition
     {
+        private static readonly Geohasher hasher = new();
+
         public int PositionId;
 
         public string VehicleRegistration;
@@ -14,11 +17,7 @@ namespace VehiclePositionFinder.Models
 
         public DateTime RecordedTimeUTC;
 
-        public string UserLatitude;
-
-        public string UserLongitude;
-
-        public double? Distance;
+        public string VehicleGeohash;
 
         internal static VehiclePosition ReadBytes(byte[] buffer, ref int offset)
         {
@@ -46,6 +45,8 @@ namespace VehiclePositionFinder.Models
             ulong time = BitConverter.ToUInt64(buffer, offset);
             vehiclePosition.RecordedTimeUTC = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(time);
             offset += 8;
+
+            vehiclePosition.VehicleGeohash = hasher.Encode(vehiclePosition.VehicleLatitude, vehiclePosition.VehicleLongitude);
 
             return vehiclePosition;
         }
